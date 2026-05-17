@@ -1,32 +1,120 @@
-Stock Price Simulation Using Monte Carlo Method
+# Stock Price Simulation Using Monte Carlo Method
 
-Overview:
-This project uses the **Monte Carlo Method** to simulate stock price movements in this case, the stock market prices of Samsung inc has been taken as an example. The Monte Carlo approach assumes that stock price behavior follows a probability distribution, allowing it to model and predict potential future prices. The datasets has been taken from Yahoo finance and stook. 
+A Jupyter Notebook that simulates future stock prices using the **Monte Carlo method** combined with **Geometric Brownian Motion (GBM)**. Given a stock ticker, the model estimates the probability distribution of the stock's price at a future point in time based on its historical return and volatility.
 
-Motivation:
-One of the biggest challenges investors face is estimating the likelihood of stock price changes and predicting whether a stock will reach a specific value. This project aims to:
-- Simulate stock price movements using **Geometric Brownian Motion (GBM)**.
-- Provide insights into potential price fluctuations based on historical data.
-- Run multiple simulations to observe price variations over time.
+---
 
-Methodology:
-1. **Data Collection**: The model uses **5 years of historical stock data** to estimate key parameters such as expected annual return and volatility.
-2. **Model Creation**: Stock price movements are simulated using **Geometric Brownian Motion (GBM)**.
-3. **Simulation Execution**: The Monte Carlo method runs multiple simulations (e.g., **1,000 simulations**) to project future stock prices.
-4. **Visualization**: The simulated price paths are plotted to visualize potential stock price movements.
+## Overview
 
-Technologies Used:
- **Python**  
- **NumPy**  
- **Pandas**  
- **Seaborn**  
- **SciPy**  
- **Matplotlib**  
+One of the key challenges investors face is evaluating the likelihood of future stock price movements. This notebook addresses that challenge by replicating price fluctuation stochastically using the Monte Carlo approach.
 
-Results:
-Multiple stock price simulations are generated to show potential future price paths. The results provide insights into possible price ranges and volatility.
+The workflow follows three main steps:
 
-Limitations:
-Assumes stock price movements follow Geometric Brownian Motion (GBM).
-Does not account for market events, news, or sudden economic changes.
-Results should be interpreted carefully and not considered financial advice.
+1. **Data Acquisition** — Fetch historical price data for a given ticker from [Stooq](https://stooq.com)
+2. **Model Construction** — Estimate annual return (CAGR) and annualized volatility, then define the GBM equation
+3. **Simulation & Analysis** — Run *N* simulations and analyze the resulting price distribution via percentiles
+
+---
+
+## Methodology
+
+### Monte Carlo Simulation
+
+The Monte Carlo method runs the GBM pricing function a large number of times (e.g. 1,000), each time drawing a different random shock from a standard normal distribution. This produces a distribution of possible future prices rather than a single point estimate.
+
+### Geometric Brownian Motion (GBM)
+
+The final stock price is calculated using the GBM equation from Reddy & Clinton (2016):
+
+$$S_{t+\Delta t} = S_t \exp\left[\left(\mu - \frac{\hat{\sigma}^2}{2}\right)\Delta t + \hat{\sigma}\,\epsilon\sqrt{\Delta t}\right]$$
+
+| Symbol | Description |
+|--------|-------------|
+| $S_t$ | Stock price at time $t$ |
+| $S_{t+\Delta t}$ | Simulated future stock price |
+| $\mu$ | Expected annual rate of return (CAGR) |
+| $\hat{\sigma}$ | Annualized expected volatility |
+| $\epsilon$ | Random draw from $\mathcal{N}(0, 1)$ |
+| $\Delta t$ | Forecast horizon in years |
+
+Annualized volatility is derived from the standard deviation of daily returns:
+
+$$\hat{\sigma} = \frac{s}{\sqrt{\tau}}, \quad \tau = \frac{\Delta t}{N}$$
+
+where $s$ is the standard deviation of daily returns and $N$ is the number of trading days in the look-back period.
+
+---
+
+## Requirements
+
+```
+numpy
+pandas
+scipy
+seaborn
+requests
+python-dateutil
+```
+
+Install all dependencies with:
+
+```bash
+pip install numpy pandas scipy seaborn requests python-dateutil
+```
+
+---
+
+## Configuration
+
+At the top of the notebook, adjust the following parameters:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `ticker` | `'3175.HK'` | Stock ticker in [Stooq format](https://stooq.com) |
+| `interval_prediction` | `1` | Forecast horizon in years |
+| `number_of_simulations` | `1000` | Number of Monte Carlo runs |
+| `look_back_x_years` | `5` | Historical look-back period in years |
+
+---
+
+## Usage
+
+1. Clone or download the repository
+2. Install the required dependencies
+3. Open the notebook:
+   ```bash
+   jupyter notebook stock_price_simulation_using_monte_carlo_method.ipynb
+   ```
+4. Set your desired `ticker` and parameters in the configuration cell
+5. Run all cells — the notebook will:
+   - Download historical price data from Stooq
+   - Plot the historical price series
+   - Run the Monte Carlo simulation
+   - Display a distribution plot of simulated prices
+   - Print key percentiles of the simulated outcomes
+
+### Example Output
+
+After running the simulation, the notebook prints percentile values such as:
+
+```
+5 percentile:  <price>
+25 percentile: <price>
+50 percentile: <price>
+75 percentile: <price>
+95 percentile: <price>
+```
+
+These percentiles indicate the range of plausible future stock prices at the end of the forecast period.
+
+---
+
+## ⚠️ Disclaimer
+
+The Monte Carlo model assumes that stock price movements follow a known probability distribution, which is a simplification. Real markets are subject to structural breaks, regime changes, and other non-random events. **Results should be interpreted with caution and are not financial advice.**
+
+---
+
+## References
+
+Reddy, K. & Clinton, V. (2016). *Simulating Stock Prices Using Geometric Brownian Motion: Evidence from Australian Companies.* Australasian Accounting, Business and Finance Journal, 10(3), 23–47. [doi:10.14453/aabfj.v10i3.3](http://dx.doi.org/10.14453/aabfj.v10i3.3)
